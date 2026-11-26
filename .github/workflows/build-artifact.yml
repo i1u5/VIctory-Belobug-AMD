@@ -1,0 +1,28 @@
+name: Debug build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pinned Rust toolchain
+        run: rustup show
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build (diag profile)
+        run: cargo build --profile diag -p victory --features diagnostics
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: victory-debug-windows-x64
+          path: |
+            target/diag/victory.exe
+            target/diag/victory.pdb
+          if-no-files-found: error
+          retention-days: 14
